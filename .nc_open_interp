@@ -35,4 +35,13 @@ all_2018=Hebing(nc_2018)
 all_2019=Hebing(nc_2019)
 all_2020=Hebing(nc_2020)
 
+print(all_2017)#确定经纬度、时间范围
+
+#选经纬度范围
+use_2017=all_2017.sel(latitude=slice(33,30),longitude=slice(122,124))
+use_2017['swh'][1].plot(x='longitude',y='latitude')
+
+#插值，原网格0.5X0.5,插成0.1X0.1
+interp_2017=use_2017.interp(latitude=np.linspace(33,30,33),longitude=np.linspace(122, 124,22),method='linear')
+
 all_2017.to_netcdf('E://2017.nc')
