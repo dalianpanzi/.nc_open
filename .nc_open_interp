@@ -80,15 +80,21 @@ Y_test=[]
 
 def process(array1,array2,list1,list2):
     for i in range(len(array1)-step*2+1):
+        global X_train,Y_train  #global 全局变量， nonlocal 局部变量使用
         x_one_tr=array1[i:i+step]
         X_train.append(x_one_tr)
         y_one_tr=array2[i+step:i+step+step]
         Y_train.append(y_one_tr)
+    X_train=np.array(X_train)
+    Y_train=np.array(Y_train)    
     for j in range(0,len(list1)-step*2+1,step*2):
+        global X_test,Y_test
         x_one_te=list1[j:j+step]
         X_test.append(x_one_te)
         y_one_te=list2[j+step:j+step+step]
         Y_test.append(y_one_te)
+    X_test=np.array(X_test)
+    Y_test=np.array(Y_test)
     return X_train,Y_train,X_test,Y_test
 
 X_train,Y_train,X_test,Y_test=process(x_tr,y_tr,x_te,y_te) 
