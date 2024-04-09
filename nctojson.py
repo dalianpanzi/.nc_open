@@ -40,7 +40,8 @@ def gen_data_dict(parameterNumber, parameterNumberName,paraunit):
         matlab_datenum=nc_n['time'].values[i]
         reftime = pd.to_datetime(str(matlab_datenum)[:-10]).strftime('%Y-%m-%dT%H:%M:%SZ')
         u=np.squeeze(nc_n[parameterNumberName][i])
-        nan_to_none = np.fliplr(np.where(np.isnan(u), None, u))
+        ###nan_to_none = np.fliplr(np.where(np.isnan(u), None, u))  np.fliplr()数据左右翻转
+        nan_to_none=np.where(np.isnan(u), None, u)
         data_list = list(nan_to_none.ravel('F'))
         d[reftime]=data_list
     return {'header':header_dict,'data':d}
