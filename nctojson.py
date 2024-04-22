@@ -59,3 +59,6 @@ for j in range(len(para_name_list)):
 filename=r"D:/DeepLearning/ZJHF/GFS_Forecast.json"
 with open(filename,'w') as f:
     json.dump(result, f)
+
+#写成json数据key只能是 str, int, float, bool or None, not tuple
+
