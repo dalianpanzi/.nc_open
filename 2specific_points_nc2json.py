@@ -13,7 +13,7 @@ import datetime
 import numpy as np
 
 
-folder_path=r"D:\Dredging_forecasting_system_Near_China_sea\FEWS-NCS\trunk\Archive"
+folder_path=r"D:\*****\FEWS-NCS\trunk\Archive"
 date=datetime.date.today()
 year=date.year
 month=date.month
@@ -73,10 +73,10 @@ point_y2,point_x2=22.5,116.25
 
 
 '''
-look=xr.open_dataset(r"D:\DeepLearning\ZJHF\test_data\0507\GFS_Forecast.nc")
+look=xr.open_dataset(r"D:\***\GFS_Forecast.nc")
 no=look.sel(y=32.75,x=121.75)
 no=no[column_name]
-wave=xr.open_dataset(r"D:\DeepLearning\ZJHF\test_data\0421\GFS-Wave_Forecast.nc")
+wave=xr.open_dataset(r"D:\***\GFS-Wave_Forecast.nc")
 wa=wave.variables
 '''
 
@@ -144,9 +144,9 @@ for j in range(len(col_list)):
     re=gen_data_dict(nc,j, col_list[j], paraunit,aim_X,aim_Y)
     result.append(re)
 
-#filename=r"D:/DeepLearning/ZJHF/nc2json/0421/GFS_Forecast_test.json"
+#filename=r"D:/***/GFS_Forecast_test.json"
 
-filename=r"D:\DeepLearning\ZJHF\nc2json"+"\\"+str(year)+"\\"+str(month)+str(day)
+filename=r"D:\***\nc2json"+"\\"+str(year)+"\\"+str(month)+str(day)
 if not os.path.exists(filename):
     os.makedirs(filename)    
 filename=filename+"\\"+folder_w[-6:-4]+"GFS_Forecast.json"
