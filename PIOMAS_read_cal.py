@@ -6,6 +6,11 @@ import numpy as np
 from scipy.spatial import KDTree
 import pandas as pd
 import os
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import PowerTransformer  #针对偏态数据
 
 
 
@@ -256,4 +261,73 @@ ice_vel=pd.DataFrame(data2['u'].values.flatten(),columns=['u'])
 ice_vel['v']=data2['v'].values.flatten()
 vel_u=uu.flatten()
 vel_v=vv.flatten()
+
+vel_real=pd.DataFrame(np.sqrt(vel_u**2+vel_v**2), columns=['vel'])
+vel_real=np.sqrt(vel_u**2+vel_v**2)
+
+#绘制核密度图
+plt.figure(figsize=(8,5))
+sns.kdeplot(vel_real, x='vel', fill=True, color='blue', alpha=0.5)
+plt.show()
+
+#针对偏态数据
+X=vel_real.reshape(-1,1)
+inertias=[]
+silhouettes=[]
+K_range=range(2,6)
+for k in K_range:
+    kmeans=KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels=kmeans.fit_predict(X_t)
+    inertias.append(kmeans.inertia_)
+    silhouettes.append(silhouette_score(X_t, labels))
+
+#肘部法则与轮廓系数
+plt.figure(figsize=(12,4))
+plt.subplot(1,2,1)
+plt.plot(K_range, inertias, 'bo-')
+plt.xlabel('Number of clusters k')
+plt.ylabel('Inertia')
+plt.title('Elbow Method') #平缓下降的点
+
+plt.subplot(1,2,2) #越接近1表示聚类效果越好  范围在[-1,1]  可选某个k值显著高于相邻值
+plt.plot(K_range, silhouettes, 'ro-')
+plt.xlabel('Number of clusters k')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score')
+plt.tight_layout()  
+plt.show()
+
+#使用数据转换
+pt=PowerTransformer(method='box-cox')
+X_t=pt.fit_transform(X)
+kmeans= KMeans(n_clusters=3, random_state=42, n_init=10, init='k-means++')
+labels=kmeans.fit_predict(X_t)
+#返回元数据找聚类中心点
+centers_orig = pt.inverse_transform(kmeans.cluster_centers_).flatten()
+sorted_idx = np.argsort(centers_orig)
+print("聚类中心（原始尺度）排序后：", centers_orig[sorted_idx])
+print("各簇样本数：", np.bincount(labels))
+
+#划分阈值--即相邻中心点的中点，但注意是trans后的
+cent_trans=kmeans.cluster_centers_.flatten()
+sort_idx_trans = np.argsort(cent_trans)
+cent_trans_sorted = cent_trans[sort_idx_trans]
+
+mid_trans = []
+for i in range(len(cent_trans_sorted)-1):
+    mid = (cent_trans_sorted[i] + cent_trans_sorted[i+1]) / 2
+    mid_trans.append(mid)
+mid_trans = np.array(mid_trans).reshape(-1, 1)
+
+# 将中点反变换回原始尺度
+mid_orig = pt.inverse_transform(mid_trans).flatten()
+def cl_vel(s):
+    if s<0.032776:
+        return 1
+    elif s<0.132209:
+        return 2
+    else:
+        return 3
+vel_le=np.vectorize(cl_vel)(vel_real)
+print(pd.Series(vel_le).value_counts(normalize=True).sort_index())
 
